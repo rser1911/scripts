@@ -1,0 +1,1 @@
+echo -n "rescan" > /sys/bus/serio/devices/serio0/drvctl
