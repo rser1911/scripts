@@ -7,6 +7,9 @@
 # original script can be found here
 # https://gist.github.com/Schnouki/fd171bcb2d8c556e8fdf
 
+# use 10.200.200.2:3128 as proxy, like
+# chromium-browser --incognito --password-store=basic --proxy-server=http://10.200.200.2:3128
+
 # ------------ adjust values below ------------
 # network namespace
 NS_NAME=vpn
@@ -23,9 +26,6 @@ set -e
 
 # trace option
 #set -x
-
-./tcppm -i127.0.0.1 8899 10.200.200.2 3128 &
-TCPPM=$!
 
 if [ $USER != "root" ]; then
     echo "This must be run as root."
@@ -88,8 +88,8 @@ EOF
 stop_vpn() {
     echo "Stopping VPN"
     ip netns pids $NS_NAME | xargs -rd'\n' kill
+    sleep 3
     # TODO wait for terminate
-    kill $TCPPM
 
 
     # clear NAT
@@ -109,7 +109,7 @@ trap stop_vpn EXIT
 
 start_vpn
 
-# TODO start your favorite torrent client
-$NS_EXEC sudo -u $REGULAR_USER sh -c './proxy -l' &
+# git clone https://github.com/abhinavsingh/proxy.py.git
+$NS_EXEC sudo -u $REGULAR_USER sh -c 'cd proxy.py; python3 -m proxy --host 0.0.0.0 --port 3128' &
 $NS_EXEC sudo -u $REGULAR_USER sh
-#transmission-gtk
+
