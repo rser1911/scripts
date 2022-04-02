@@ -1,0 +1,21 @@
+#!/bin/bash
+# wmctrl -x -r :ACTIVE: -b add,skip_taskbar
+
+bash -c 'sleep 10
+./toggle-decorations `xdotool getactivewindow`
+wmctrl -r :ACTIVE: -b toggle,above
+v4l2-ctl -c gamma=3
+v4l2-ctl -c brightness=200
+wmctrl -x -r :ACTIVE: -b add,skip_taskbar
+wmctrl -r :ACTIVE: -e 0,`cat poscam`
+./alphapng ./catalis.png &
+sleep 2
+wmctrl -x -r :ACTIVE: -b add,skip_taskbar
+wmctrl -r :ACTIVE: -e 0,`cat poscat`
+wmctrl -r :ACTIVE: -b toggle,above' &
+
+mplayer tv:// -tv driver=v4l2:width=320:height=240
+# mplayer tv:// -tv driver=v4l2
+# cvlc v4l2:///dev/video0
+
+killall -9 alphapng

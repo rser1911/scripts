@@ -1,0 +1,41 @@
+#!/bin/bash
+
+FSIZE=100
+if [ -n "$1" ]; then
+    FSIZE=50
+fi
+
+read s
+
+RES=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 out.mp4 | sed 's/,/x/')
+POS=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "out.mp4")
+POS=$(echo "$POS - 1.5" | bc)
+
+convert -size $RES xc:Black -fill white -gravity Center -font KazimirText-Regular.ttf -weight 700 -pointsize $FSIZE -annotate 0 "$s" slide.png
+
+ffmpeg -f lavfi -i anullsrc=r=48000 -loop 1 -i slide.png -vf fade=out:10:15 -t 1 -y -pix_fmt yuv420p -r 15 slide.mp4
+
+ADELAY=450
+if [ -n "$1" ]; then
+    ADELAY=1500
+fi
+
+ffmpeg -i slide.mp4 -i out.mp4 -filter_complex "[1:v] fade=t=in:st=0:d=1,fade=t=out:st=$POS:d=1 [1v]; [1:a] adelay=$ADELAY|$ADELAY [1a]; [0:v] [0:a] [1v] [1a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y out.ok.mp4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#POS=$(ffprobe -v error -count_frames -select_streams v:0   -show_entries stream=nb_read_frames -of default=nokey=1:noprint_wrappers=1 "out.mp4")
+#ffmpeg -i "out.mp4" -itsoffset 0.45 -i "out.mp4" -map 0:v -map 1:a -y -vf fade=in:0:15,fade=out:$(($POS-15)):15  zzz.mp4
+#ffmpeg -i slide.mp4 -i out.mp4  -filter_complex concat=n=2:v=1:a=1 -y zzz2.mp4
+#ffmpeg -i slide.mp4 -i zzz.mp4 -y -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]"  zzz2.mp4
