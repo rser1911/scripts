@@ -11,3 +11,7 @@ Restart ps/2 keyboard
 ### make_video_lesson
 Scripts for make video lesson with logo, camera and voice shift
 
+
+### __replay__
+Record and play mouse and keyboard session
+

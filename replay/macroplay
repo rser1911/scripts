@@ -1,0 +1,2 @@
+sleep 1
+scriptreplay --timing=recordt recordi | xmacroplay ':0'

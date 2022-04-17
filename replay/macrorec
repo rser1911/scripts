@@ -1,0 +1,2 @@
+DISPLAY=:0 script -c 'xmacrorec2 -k 9 2>/dev/null' -q --timing=recordt recordi
+
