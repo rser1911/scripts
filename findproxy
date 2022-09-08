@@ -1,0 +1,19 @@
+#!/bin/bash
+# pip install -U git+https://github.com/constverum/ProxyBroker.git
+
+exec 2> /dev/null
+rm list
+touch list
+# --lvl High --strict --countries US
+proxybroker find --types HTTPS --lvl High --strict -l 20 -o list &
+tail -f list | grep --line-buffered '.*' | (I=0; while IFS= read -r LINE0 ; do 
+  I=$(($I+1))
+  ADDR=$(printf '%s\n' "${LINE0}" | grep -oE '[0-9.]+:[0-9]*')
+  echo -ne "$I\t"
+  printf '%-28s' "$ADDR"
+  RES=$(https_proxy=http://$ADDR curl -s -m 8 'https://rutracker.org/robots.txt' -o - | grep -E '(Host: rutracker.org|"/robots.txt?)' | wc -l)
+  [[ $RES -eq 1 ]] && echo -n 'x'
+  echo
+  [[ $I -eq 20 ]] && break
+done; pkill -P $$)
+
