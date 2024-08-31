@@ -20,5 +20,5 @@ python3 tts.py <file.txt>
 
 ```
 docker build -t tts .
-docker run -v .:/root/mnt -t tts /root/mnt/in.txt
+docker run --rm -v .:/root/mnt -t tts /root/mnt/in.txt
 ```
